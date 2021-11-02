@@ -11,3 +11,5 @@ window.addEventListener('DOMContentLoaded', () => {
     //   {name: 'Понял', handler: () => {console.log('Уведомление закрыто')}}
     // )
 });
+export let dataDb;
+fetch('http://localhost:5555/places').then(r => r.json()).then(res => dataDb = res);

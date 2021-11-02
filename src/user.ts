@@ -64,12 +64,12 @@ function getUserData(user: unknown): User {
   // return console.log('Ключ должен быть строкой');
 }
 
-function getFavoritesAmount(user: unknown) {
-  if (typeof user === 'string') {
-    return localStorage.getItem(user);
-  }
-  return  console.log('Ключ должен быть строкой');
-}
+// function getFavoritesAmount(user: unknown) {
+//   if (typeof user === 'string') {
+//     return localStorage.getItem(user);
+//   }
+//   return  console.log('Ключ должен быть строкой');
+// }
 
 // console.log(getUserData('user1'));
 // console.log(getFavoritesAmount('favoritesAmount'));

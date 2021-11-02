@@ -1,6 +1,28 @@
 import { renderBlock } from './lib.js';
-function handlerSearch(data) {
-    console.log(data);
+import { dataDb } from './index.js';
+import { renderSearchResultsBlock, toggleFavoriteItem } from './search-results.js';
+function handlerSearch(data, price) {
+    let allFind = {};
+    let find = null;
+    let key = null;
+    (function searchAll(data, price) {
+        for (let i in data) {
+            if (data.hasOwnProperty(i)) {
+                if (i === 'price') {
+                    if (price >= data[i]) {
+                        find = data;
+                        key = data.id;
+                        allFind[key] = find;
+                    }
+                }
+                if (data[i] && data[i].constructor === Object) {
+                    searchAll(data[i], price);
+                }
+            }
+        }
+        return allFind;
+    })(data, price);
+    return allFind;
 }
 export function search() {
     const form = document.getElementsByTagName('form')[0];
@@ -13,7 +35,8 @@ export function search() {
             outDate: formData.get('checkout').toString(),
             maxPrice: +formData.get('price')
         };
-        handlerSearch(data);
+        renderSearchResultsBlock(handlerSearch(dataDb, data.maxPrice));
+        toggleFavoriteItem();
     };
 }
 const d = new Date();
