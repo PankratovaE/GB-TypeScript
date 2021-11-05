@@ -1,6 +1,7 @@
 import { renderBlock } from './lib.js'
 import { dataDb } from './index.js'
 import { renderSearchResultsBlock, toggleFavoriteItem } from './search-results.js'
+import {FlatRentSdk} from './flat-rent-sdk.js'
 
 interface Place {
   "id": number,
@@ -16,8 +17,8 @@ interface Places {
   [key: number]: Place
 }
 
-interface SearchFormData {
-  // city: string,
+export interface SearchFormData {
+  city: string,
   inDate: string,
   outDate: string,
   maxPrice: number,
@@ -51,20 +52,60 @@ function handlerSearch(data, price): Places {
 
 export function search() {
   const form = document.getElementsByTagName('form')[0];
-
+  
   form.onsubmit = (e) => {
     e.preventDefault();
     let formData = new FormData(form);
-  
-  const data: SearchFormData = {
-    // city: formData.get('city').toString(),
-    inDate: formData.get('checkin').toString(),
-    outDate: formData.get('checkout').toString(),
-    maxPrice: +formData.get('price')
+    // let inDate = formData.get('checkin').toString();
+    // console.log(new Date(inDate));
+    
+    //получить чекбоксы
+    const checkboxes = document.getElementsByClassName('selectProvider');
+    const checkedItem = [];
+    //выбранные сложить в массив
+    for (let i = 0; i < checkboxes.length; i++) {
+      let item = checkboxes[i] as HTMLInputElement
+      if (item.checked) {
+        checkedItem.push(item);
+      }
+    }
+
+    const data: SearchFormData = {
+      city: 'Санкт-Петербург',
+      inDate: formData.get('checkin').toString(),
+      outDate: formData.get('checkout').toString(),
+      maxPrice: +formData.get('price')
+    }
+  // при отправке формы проверяем выбран ли провыйдер
+  if (!checkedItem.length) { // если нет, то выбрать
+    console.log('Choose provider and submit again.');
+  }
+  //из выбранных посмотреть один или оба выбраны и в зависимости от этого на поиск разные функции
+  for (let i = 0; i < checkedItem.length; i++) {
+    if (checkedItem[i].value === 'homy') {
+      renderSearchResultsBlock(handlerSearch(dataDb, data.maxPrice));
+      toggleFavoriteItem();
+    } else if (checkedItem[i].value === 'flat-rent') {
+      console.log('будем искать в sdk');
+      const newFlat = new FlatRentSdk;
+      const flatRentData = {
+        city: 'Санкт-Петербург',
+        checkInDate: new Date(formData.get('checkin').toString()),
+        checkOutDate: new Date(formData.get('checkout').toString()),
+        priceLimit: +formData.get('price')
+      }
+      const foundFlats = newFlat.search(flatRentData) 
+      // поиск по отдельности работает, решить с разным именованием полей
+      // сделать поиск у двух провайдеров одновременно
+      console.log(foundFlats.then(res => {
+        renderSearchResultsBlock(res)
+        toggleFavoriteItem()
+      }))
+      
+    }
+    
   }
 
-  renderSearchResultsBlock(handlerSearch(dataDb, data.maxPrice));
-  toggleFavoriteItem();
 }
 }
 
@@ -94,10 +135,10 @@ export function renderSearchFormBlock (dateIn: string = defaultIn, dateOut: stri
             <input id="city" type="text" disabled value="Санкт-Петербург" />
             <input type="hidden" disabled value="59.9386,30.3141" />
           </div>
-          <!--<div class="providers">
-            <label><input type="checkbox" name="provider" value="homy" checked /> Homy</label>
-            <label><input type="checkbox" name="provider" value="flat-rent" checked /> FlatRent</label>
-          </div>--!>
+          <div class="providers">
+            <label><input type="checkbox" name="provider" class="selectProvider" value="homy" checked /> Homy</label>
+            <label><input type="checkbox" name="provider" class="selectProvider" value="flat-rent" /> FlatRent</label>
+          </div>
         </div>
         <div class="row">
           <div>

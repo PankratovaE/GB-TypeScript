@@ -1,13 +1,15 @@
 {
   "name": "gb-typescript",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf public/scripts && tsc",
-    "build:dev": "rimraf public/scripts && tsc -p tsconfig.dev.json",
-    "start": "http-server -p 4100 public",
+    "build": "rm -rf public/scripts && tsc",
+    "build:dev": "rm -rf public/scripts && tsc -p tsconfig.dev.json",
+    "start": "http-server -p 4200 public",
+    "start-flat": "http-server -p 3100",
     "lint": "eslint src --ext .js --ext .ts",
     "lint-fix": "eslint src --ext .js --ext .ts --fix",
     "backend": "json-server -p 5555 ./db.json"
@@ -24,6 +26,7 @@
   },
   "homepage": "https://github.com/PankratovaE/GB-TypeScript#readme",
   "devDependencies": {
+    "@types/node": "^16.11.6",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
     "eslint": "^8.0.1",
@@ -32,6 +35,7 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "json-server": "^0.17.0"
+    "json-server": "^0.17.0",
+    "tsc": "^2.0.3"
   }
 }

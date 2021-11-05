@@ -57,7 +57,7 @@ const favoriteAll: favoritePlaces = {
 
 
 
-export function toggleFavoriteItem() {
+export function toggleFavoriteItem(): void {
 
   const blocks = document.querySelectorAll('#heart');
 
