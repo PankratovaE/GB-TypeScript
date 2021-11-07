@@ -103,7 +103,7 @@ export class FlatRentSdk {
         
                 if (parameters.priceLimit != null) {
                     flats = flats.filter((flat) => {
-                        return flat.price <= parameters.priceLimit
+                         return flat.price <= parameters.priceLimit
                     })
                 }
         

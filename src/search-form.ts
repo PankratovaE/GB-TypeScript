@@ -3,17 +3,17 @@ import { dataDb } from './index.js'
 import { renderSearchResultsBlock, toggleFavoriteItem } from './search-results.js'
 import {FlatRentSdk} from './flat-rent-sdk.js'
 
-interface Place {
+export interface Place {
   "id": number,
-  "name": string,
-  "description": string,
-  "image": string,
-  "remoteness": number,
+  "title": string, //name
+  "details": string, //description
+  "photos": string [], //image
+  "coordinates": [],
   "bookedDates": string[],
-  "price": number
+  "totalPrice": number //price
 }
 
-interface Places {
+export interface Places {
   [key: number]: Place
 }
 
@@ -28,12 +28,13 @@ function handlerSearch(data, price): Places {
   let allFind = {};
   let find = null;
   let key = null;
-
+ 
   (function searchAll (data, price) {
     for (let i in data) {
         if (data.hasOwnProperty(i)) {
-          if (i === 'price') {
+          if (i === 'totalPrice') {
             if ( price >= data[i]) {
+            
               find = data;
               key = data.id;
               allFind[key] = find;
@@ -56,9 +57,7 @@ export function search() {
   form.onsubmit = (e) => {
     e.preventDefault();
     let formData = new FormData(form);
-    // let inDate = formData.get('checkin').toString();
-    // console.log(new Date(inDate));
-    
+
     //получить чекбоксы
     const checkboxes = document.getElementsByClassName('selectProvider');
     const checkedItem = [];
@@ -79,14 +78,20 @@ export function search() {
   // при отправке формы проверяем выбран ли провыйдер
   if (!checkedItem.length) { // если нет, то выбрать
     console.log('Choose provider and submit again.');
-  }
-  //из выбранных посмотреть один или оба выбраны и в зависимости от этого на поиск разные функции
-  for (let i = 0; i < checkedItem.length; i++) {
+  } else {
+    let homyFounded: Places = {};
+    let flatRentFounded: Places ={};
+    let allFound: Places = {};
+
+    for (let i = 0; i < checkedItem.length; i++) {
     if (checkedItem[i].value === 'homy') {
-      renderSearchResultsBlock(handlerSearch(dataDb, data.maxPrice));
+      homyFounded = handlerSearch(dataDb, data.maxPrice);
+      allFound = Object.assign(homyFounded);
+      renderSearchResultsBlock(allFound);
       toggleFavoriteItem();
-    } else if (checkedItem[i].value === 'flat-rent') {
-      console.log('будем искать в sdk');
+    }
+    if (checkedItem[i].value === 'flat-rent') {
+
       const newFlat = new FlatRentSdk;
       const flatRentData = {
         city: 'Санкт-Петербург',
@@ -95,17 +100,24 @@ export function search() {
         priceLimit: +formData.get('price')
       }
       const foundFlats = newFlat.search(flatRentData) 
-      // поиск по отдельности работает, решить с разным именованием полей
-      // сделать поиск у двух провайдеров одновременно
-      console.log(foundFlats.then(res => {
-        renderSearchResultsBlock(res)
-        toggleFavoriteItem()
-      }))
-      
-    }
-    
-  }
+         
+      foundFlats.then(res => {
+        flatRentFounded = Object.assign({},res);
+        //переименовать ключи в получившемся объекте
+        let renamedFlatRent = Object.entries(flatRentFounded).reduce((u, [n, v]) => {
+          u[`${n}FRsdk`] = v;
+          return u;
+        }, {});
+        //собрать два объекта в один
+        allFound = Object.assign(homyFounded, renamedFlatRent);
+        //вызвать рендер с общим объектом
+        renderSearchResultsBlock(allFound);
+        toggleFavoriteItem();
 
+      })
+    }
+  }
+  }
 }
 }
 

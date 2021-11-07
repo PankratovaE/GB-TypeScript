@@ -18,10 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 export let dataDb;
 fetch('http://localhost:5555/places').then(r => r.json()).then(res => dataDb = res);
-// const newFlat = new FlatRentSdk;
-// const allFlats = newFlat.get('vnd331') 
 
-// console.log(allFlats)
 
 
 

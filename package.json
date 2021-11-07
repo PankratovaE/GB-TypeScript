@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf public/scripts && tsc",
     "build:dev": "rm -rf public/scripts && tsc -p tsconfig.dev.json",
-    "start": "http-server -p 4200 public",
+    "start": "http-server -p 4100 public",
     "start-flat": "http-server -p 3100",
     "lint": "eslint src --ext .js --ext .ts",
     "lint-fix": "eslint src --ext .js --ext .ts --fix",
