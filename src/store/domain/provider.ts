@@ -1,7 +1,7 @@
 import { Place } from './place.js'
-import { SearchFilter  } from './search-filter.js'
+import { SearchFormData  } from './search-form-data.js'
 
 export interface Provider {
-    find(filter: SearchFilter): Promise<Place[]>
-    getById(id: string): Promise<Place>
+    search(filter: SearchFormData): Place[]
+    // getById(id: string): Promise<Place>
 }

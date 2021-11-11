@@ -1,56 +1,38 @@
-import { HttpHelper } from "../../domain/http-helper.js";
 import { Place } from "../../domain/place.js";
 import { Provider } from "../../domain/provider.js";
-import { SearchFilter } from "../../domain/search-filter.js";
-import { PlaceListResponse, PlaceResponse, Place as HomyPlace } from "./response.js";
+import { SearchFormData } from "../../domain/search-form-data.js";
+import { dataDb } from './getData.js'
 
 export class HomyProvider implements Provider {
-    public static provider = 'homy'
-    private static apiUrl = 'http://localhost:5555/places'
+    // public static provider = 'homy'
+    // private static apiUrl = 'http://localhost:5555/places'
 
-    public find(filter: SearchFilter): Promise<Place[]> {
-        return HttpHelper.fetchAsJson<PlaceListResponse>(
-            // HomyProvider.apiUrl + '/place?' + this.convertFilterToQueryString(filter)
-            HomyProvider.apiUrl
-        )
-        .then((response) => {
-            this.assertIsValidResponse(response)
-            console.log(this.convertPlaceListResponse(response));
-            
-            return this.convertPlaceListResponse(response)
-        })
-    }
+    private dataDb = dataDb;
 
-    public getById(id: string): Promise<Place> {
-        return HttpHelper.fetchAsJson<PlaceResponse>(HomyProvider.apiUrl + '/place/' + id)
-        .then((response) => {
-            this.assertIsValidResponse(response)
-            return this.convertPlaceResponse(response.item)
-        })
-    }
-    private assertIsValidResponse(response: PlaceListResponse | PlaceResponse): void {
-        if (response.errorMessage != null) {
-            throw new Error(response.errorMessage)
-        }
-    }
-    private convertFilterToQueryString(filter: SearchFilter): string {
-        return `search=${filter.price}` + `&dates=${filter.dateIn} ${filter.dateOut}`
-    }
-    private convertPlaceListResponse(response: PlaceListResponse): Place[] {
-        return response.items.map((item) => {
-            return this.convertPlaceResponse(item)
-        })
-    }
-    private convertPlaceResponse(item: HomyPlace): Place {
-        return new Place(
-            HomyProvider.provider,
-            String(item.id),
-            item.title,
-            item.details,
-            item.photos,
-            item.coordinates,
-            item.bookedDates,
-            item.totalPrice,
-        )
+    public search(formData: SearchFormData): Place[] {
+
+        let price = formData.priceLimit;
+        let allFind = [];
+        let find = null;
+        
+        (function searchAll (data = this.dataDb, price) {
+            for (let i in data) {
+                if (data.hasOwnProperty(i)) {
+                    if (i === 'totalPrice') {
+                        if ( price >= data[i]) {
+                            find = data;
+                            allFind.push(data)
+                        }
+                    }
+                    if (data[i] && data[i].constructor === Object) {
+                    searchAll(data[i], price)
+                    }
+                }
+            }
+            return allFind;  
+            })(this.dataDb, price)
+
+        return allFind;
     }
 }
+ 

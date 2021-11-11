@@ -1,55 +1,8 @@
 import { renderBlock } from './lib.js'
-import { dataDb } from './index.js'
 import { renderSearchResultsBlock, toggleFavoriteItem } from './search-results.js'
-import {FlatRentSdk} from './flat-rent-sdk.js'
-
-export interface Place {
-  "id": number,
-  "title": string, //name
-  "details": string, //description
-  "photos": string [], //image
-  "coordinates": [],
-  "bookedDates": string[],
-  "totalPrice": number //price
-}
-
-export interface Places {
-  [key: number]: Place
-}
-
-export interface SearchFormData {
-  city: string,
-  inDate: string,
-  outDate: string,
-  maxPrice: number,
-}
-
-function handlerSearch(data, price): Places {
-  let allFind = {};
-  let find = null;
-  let key = null;
- 
-  (function searchAll (data, price) {
-    for (let i in data) {
-        if (data.hasOwnProperty(i)) {
-          if (i === 'totalPrice') {
-            if ( price >= data[i]) {
-            
-              find = data;
-              key = data.id;
-              allFind[key] = find;
-            }
-          }
-          if (data[i] && data[i].constructor === Object) {
-            searchAll(data[i], price)
-          }
-        }
-      }
-    return allFind;  
-  })(data, price)
-
-  return allFind;
-}
+import { Place } from './store/domain/place.js'
+import { SearchFormData } from './store/domain/search-form-data.js'
+import { factory } from './store/domain/class-factory.js'
 
 export function search() {
   const form = document.getElementsByTagName('form')[0];
@@ -60,63 +13,36 @@ export function search() {
 
     //получить чекбоксы
     const checkboxes = document.getElementsByClassName('selectProvider');
-    const checkedItem = [];
+    const checkedProviders = [];
     //выбранные сложить в массив
     for (let i = 0; i < checkboxes.length; i++) {
       let item = checkboxes[i] as HTMLInputElement
       if (item.checked) {
-        checkedItem.push(item);
+        checkedProviders.push(item.value);
       }
     }
 
     const data: SearchFormData = {
       city: 'Санкт-Петербург',
-      inDate: formData.get('checkin').toString(),
-      outDate: formData.get('checkout').toString(),
-      maxPrice: +formData.get('price')
+      checkInDate: new Date(formData.get('checkin').toString()),
+      checkOutDate: new Date(formData.get('checkout').toString()),
+      priceLimit: +formData.get('price')
     }
   // при отправке формы проверяем выбран ли провыйдер
-  if (!checkedItem.length) { // если нет, то выбрать
+  if (!checkedProviders.length) { // если нет, то выбрать
     console.log('Choose provider and submit again.');
   } else {
-    let homyFounded: Places = {};
-    let flatRentFounded: Places ={};
-    let allFound: Places = {};
 
-    for (let i = 0; i < checkedItem.length; i++) {
-    if (checkedItem[i].value === 'homy') {
-      homyFounded = handlerSearch(dataDb, data.maxPrice);
-      allFound = Object.assign(homyFounded);
-      renderSearchResultsBlock(allFound);
+    const providers = checkedProviders.map(name => factory(name));
+
+      Promise.all(
+        providers.map(provider => provider.search(data))
+      ).then((result) => {
+
+      const allResults: Place[] = [].concat(...result)
+      renderSearchResultsBlock(allResults);
       toggleFavoriteItem();
-    }
-    if (checkedItem[i].value === 'flat-rent') {
-
-      const newFlat = new FlatRentSdk;
-      const flatRentData = {
-        city: 'Санкт-Петербург',
-        checkInDate: new Date(formData.get('checkin').toString()),
-        checkOutDate: new Date(formData.get('checkout').toString()),
-        priceLimit: +formData.get('price')
-      }
-      const foundFlats = newFlat.search(flatRentData) 
-         
-      foundFlats.then(res => {
-        flatRentFounded = Object.assign({},res);
-        //переименовать ключи в получившемся объекте
-        let renamedFlatRent = Object.entries(flatRentFounded).reduce((u, [n, v]) => {
-          u[`${n}FRsdk`] = v;
-          return u;
-        }, {});
-        //собрать два объекта в один
-        allFound = Object.assign(homyFounded, renamedFlatRent);
-        //вызвать рендер с общим объектом
-        renderSearchResultsBlock(allFound);
-        toggleFavoriteItem();
-
-      })
-    }
-  }
+    })
   }
 }
 }
@@ -148,8 +74,8 @@ export function renderSearchFormBlock (dateIn: string = defaultIn, dateOut: stri
             <input type="hidden" disabled value="59.9386,30.3141" />
           </div>
           <div class="providers">
-            <label><input type="checkbox" name="provider" class="selectProvider" value="homy" checked /> Homy</label>
-            <label><input type="checkbox" name="provider" class="selectProvider" value="flat-rent" /> FlatRent</label>
+            <label><input type="checkbox" name="provider" class="selectProvider" value="HomyProvider" checked /> Homy</label>
+            <label><input type="checkbox" name="provider" class="selectProvider" value="FlatRentSdk" /> FlatRent</label>
           </div>
         </div>
         <div class="row">
