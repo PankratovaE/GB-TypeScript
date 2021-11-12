@@ -13,7 +13,7 @@ export function renderSearchStubBlock () {
   )
 }
 
-export function renderEmptyOrErrorSearchBlock (reasonMessage) {
+export function renderEmptyOrErrorSearchBlock (reasonMessage: string) {
   renderBlock(
     'search-results-block',
     `
@@ -66,29 +66,29 @@ export function toggleFavoriteItem(): void {
     blocks[i].addEventListener('click', (event) => {
 
       const target = event.target as HTMLElement;
-      let id = target.getAttribute('data-id');
+      let id: any = target.getAttribute('data-id');
       let name = target.getAttribute('data-name');
       let image = target.getAttribute('data-image');
 
-      let isFavorite = getFavoritesAmount('favoriteItems');
+      let favoriteItems: any = getFavoritesAmount('favoriteItems');
       const isFav = searchInFavorites(id) // true or false
 
       if (isFav) {
-        let newFavorite = {}
-        for (let j in isFavorite) {
+        let newFavorite: any = {}
+        for (let j in favoriteItems) {
           if (!(j == id)) {
-            newFavorite[j] = isFavorite[j];
+            newFavorite[j] = favoriteItems[j];
           }
         }
         localStorage.setItem('favoriteItems', JSON.stringify(newFavorite));
         target.classList.remove('active');
       } else {
-        isFavorite[id] = {
+        favoriteItems[id] = {
           id: id,
           name: name,
           image: image
         }
-        localStorage.setItem('favoriteItems', JSON.stringify(isFavorite));
+        localStorage.setItem('favoriteItems', JSON.stringify(favoriteItems));
         target.classList.add('active');
       }
     })

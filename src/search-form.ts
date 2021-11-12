@@ -4,12 +4,12 @@ import { Place } from './store/domain/place.js'
 import { SearchFormData } from './store/domain/search-form-data.js'
 import { factory } from './store/domain/class-factory.js'
 
-export function search() {
+export function search(): void {
   const form = document.getElementsByTagName('form')[0];
   
   form.onsubmit = (e) => {
     e.preventDefault();
-    let formData = new FormData(form);
+    let formData: any | null = new FormData(form);
 
     //получить чекбоксы
     const checkboxes = document.getElementsByClassName('selectProvider');
@@ -36,10 +36,13 @@ export function search() {
     const providers = checkedProviders.map(name => factory(name));
 
       Promise.all(
-        providers.map(provider => provider.search(data))
-      ).then((result) => {
+        providers.map(provider => {
+          if (provider)
+          provider.search(data)
+        })
+        ).then((result) => {
 
-      const allResults: Place[] = [].concat(...result)
+      const allResults: Place[] = ([] as any[]).concat(...result)
       renderSearchResultsBlock(allResults);
       toggleFavoriteItem();
     })
@@ -52,7 +55,7 @@ const dateOut = new Date(d.getFullYear(), d.getMonth() + 2, 0);
 const defaultDateIn = new Date(d.setDate(d.getDate() + 1));
 const defaultDateOut = new Date(d.setDate(d.getDate() + 3));
 
-function formattedDate(date) {
+function formattedDate(date: Date) {
   return [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(n => n < 10 ? `0${n}` : `${n}`).join('-');
 }
 
