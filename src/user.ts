@@ -57,12 +57,16 @@ interface User {
   avatarUrl: string
 }
 
-function getUserData(user: unknown): User {
-  if (typeof user === 'string') {
-    return JSON.parse(localStorage.getItem(user));
-  }
-  // return console.log('Ключ должен быть строкой');
+const itemUser: any = localStorage.getItem('user');
+const item: unknown = JSON.parse(itemUser);
+
+function isUser(data:any):data is User {
+  return typeof data === 'object' && 'username' in data
 }
+if (isUser(item)) {
+  item.username
+}
+
 
 // function getFavoritesAmount(user: unknown) {
 //   if (typeof user === 'string') {

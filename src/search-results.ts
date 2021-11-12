@@ -94,15 +94,21 @@ export function toggleFavoriteItem(): void {
     })
   } 
 }
+function isFavoriteItem(data:any):data is favoritePlaces{
+  return typeof data === 'object' && 'name' in data 
+}
+function getFavoritesAmount(key: string): favoritePlaces | undefined {
+  let storageItem: any = localStorage.getItem(key);
+  let parseItem: unknown = JSON.parse(storageItem)
 
-function getFavoritesAmount(key): favoritePlaces {
-  if (typeof key === 'string') {
+  if (isFavoriteItem(parseItem)) {
        
-    return JSON.parse(localStorage.getItem(key));
+    return parseItem
   }
+  return undefined
  }
 
-function searchInFavorites(id) {
+function searchInFavorites(id: string | number) {
   const dataFavorites = getFavoritesAmount('favoriteItems');
   for (let i in dataFavorites) {
     if (i == id) {
@@ -119,7 +125,7 @@ function sortResult (Places: Place[]) {
   })
 }
 
-function selectSorting(index, Places) {
+function selectSorting(index: number, Places: Place[]) {
   switch (index) {
     case 0:
       renderSearchResultsBlock(Places.sort(sortByPriceUp));
