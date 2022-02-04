@@ -4,7 +4,7 @@ const database = [
         title: 'Radisson Royal Hotel',
         details: 'Отель расположен в 4 минутах ходьбы от станции метро «Маяковская». К услугам гостей фитнес-центр и спа-центр с сауной и гидромассажной ванной.',
         photos: ['vnd331.png', 'vnd331.png'],
-        coordinates: [59.9322936,30.3460129],
+        coordinates: 3.0,
         bookedDates: [],
         price: 12000
     },
@@ -13,7 +13,7 @@ const database = [
         title: 'Номера на Садовой',
         details: 'Расположен в 7 минутах ходьбы от Невского проспекта. К услугам гостей круглосуточная стойка регистрации и бесплатный Wi-Fi.',
         photos: ['ab2e2.png', 'ab2e2.png'],
-        coordinates: [59.930325,30.3291592],
+        coordinates: 8.9,
         bookedDates: [],
         price: 4500
     },
@@ -22,7 +22,7 @@ const database = [
         title: 'Мини Отель на Невском 136',
         details: 'Мини-отель расположен в Санкт-Петербурге, в 5 минутах ходьбы от станции метро «Площадь Восстания» и Московского железнодорожного вокзала.',
         photos: ['mvm32l.png', 'mvm32l.png'],
-        coordinates: [59.9299603,30.3658932],
+        coordinates: 5.4,
         bookedDates: [],
         price: 3800
     },
@@ -31,7 +31,7 @@ const database = [
         title: 'Отель Усадьба Державина',
         details: 'Прекрасный отель недалеко от Исаакиевского собора с бесплатным Wi-Fi на всей территории.',
         photos: ['bvep12.png', 'bvep12.png'],
-        coordinates: [59.9194966,30.309389],
+        coordinates: 14.8,
         bookedDates: [],
         price: 8700
     }

@@ -1,4 +1,5 @@
 import { renderBlock } from './lib.js'
+import { Place } from './store/domain/place.js'
 
 export function renderSearchStubBlock () {
   renderBlock(
@@ -94,7 +95,7 @@ export function toggleFavoriteItem(): void {
   } 
 }
 
-function getFavoritesAmount(key: unknown): favoritePlaces {
+function getFavoritesAmount(key): favoritePlaces {
   if (typeof key === 'string') {
        
     return JSON.parse(localStorage.getItem(key));
@@ -110,26 +111,79 @@ function searchInFavorites(id) {
   }
 }
 
-export function renderSearchResultsBlock (Places) {
+
+function sortResult (Places: Place[]) {
+  let sel = document.getElementById('select') as HTMLSelectElement;
+  sel.addEventListener('change', () => {
+    selectSorting(sel.selectedIndex, Places);  // 0, 1, 2
+  })
+}
+
+function selectSorting(index, Places) {
+  switch (index) {
+    case 0:
+      renderSearchResultsBlock(Places.sort(sortByPriceUp));
+      break
+    case 1:
+      renderSearchResultsBlock(Places.sort(sortByPriceDown));
+      break
+    case 2:
+      renderSearchResultsBlock(Places.sort(sortByDistance));
+      break
+    default:
+      renderSearchResultsBlock(Places);
+      break
+  }
+}
+
+
+
+function sortByPriceUp(one: Place, two: Place) {
+  if (one.totalPrice > two.totalPrice) {
+    return 1
+  } else if (one.totalPrice < two.totalPrice) {
+    return -1
+  } else {
+    return 0
+  }
+}
+
+function sortByPriceDown(one: Place, two: Place) {
+  if (one.totalPrice < two.totalPrice) {
+    return 1
+  } else if (one.totalPrice > two.totalPrice) {
+    return -1
+  } else {
+    return 0
+  }
+}
+
+function sortByDistance(one: Place, two: Place) {
+  if (one.coordinates > two.coordinates) {
+    return 1
+  } else if (one.totalPrice < two.totalPrice) {
+    return -1
+  } else {
+    return 0
+  }
+}
+
+export function renderSearchResultsBlock (Places: Place[]) {
   // записать в хранилище что-нибудь
   localStorage.setItem('favoriteItems', JSON.stringify(favoriteAll));
 
-  renderBlock(
-    'search-results-block',
-    `
-    <div class="search-results-header">
-        <p>Результаты поиска</p>
-        <div class="search-results-filter">
-            <span><i class="icon icon-filter"></i> Сортировать:</span>
-            <select>
-                <option selected="">Сначала дешёвые</option>
-                <option selected="">Сначала дорогие</option>
-                <option>Сначала ближе</option>
-            </select>
-        </div>
-    </div>`
-    );
-  let html = '';
+  let html = `
+  <div class="search-results-header">
+      <p>Результаты поиска</p>
+      <div class="search-results-filter">
+          <span><i class="icon icon-filter"></i> Сортировать:</span>
+          <select id="select">
+              <option value="priceUp">Сначала дешёвые</option>
+              <option value="priceDown">Сначала дорогие</option>
+              <option value="distance">Сначала ближе</option>
+          </select>
+      </div>
+  </div>`;
   for (let i in Places) {
  
     let inFavorites = searchInFavorites(Places[i].id) // true or false
@@ -146,7 +200,7 @@ export function renderSearchResultsBlock (Places) {
             <p>${Places[i].title}</p>
             <p class="price">${Places[i].totalPrice}</p>
           </div>
-          <div class="result-info--map"><i class="map-icon"></i> 2.5км от вас</div>
+          <div class="result-info--map"><i class="map-icon"></i> ${Places[i].coordinates} км от вас</div>
           <div class="result-info--descr">${ Places[i].details }</div>
           <div class="result-info--footer">
             <div>
@@ -162,6 +216,7 @@ export function renderSearchResultsBlock (Places) {
       'search-results-block',
       html
     )
+    sortResult(Places)
   }
 }
 
