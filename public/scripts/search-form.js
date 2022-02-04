@@ -1,4 +1,21 @@
 import { renderBlock } from './lib.js';
+function handlerSearch(data) {
+    console.log(data);
+}
+export function search() {
+    const form = document.getElementsByTagName('form')[0];
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        let formData = new FormData(form);
+        const data = {
+            // city: formData.get('city').toString(),
+            inDate: formData.get('checkin').toString(),
+            outDate: formData.get('checkout').toString(),
+            maxPrice: +formData.get('price')
+        };
+        handlerSearch(data);
+    };
+}
 const d = new Date();
 const dateOut = new Date(d.getFullYear(), d.getMonth() + 2, 0);
 const defaultDateIn = new Date(d.setDate(d.getDate() + 1));
@@ -12,7 +29,7 @@ const defaultIn = formattedDate(defaultDateIn);
 const defaultOut = formattedDate(defaultDateOut);
 export function renderSearchFormBlock(dateIn = defaultIn, dateOut = defaultOut) {
     renderBlock('search-form-block', `
-    <form>
+    <form id="form">
       <fieldset class="search-filedset">
         <div class="row">
           <div>
@@ -39,7 +56,7 @@ export function renderSearchFormBlock(dateIn = defaultIn, dateOut = defaultOut) 
             <input id="max-price" type="text" value="" name="price" class="max-price" />
           </div>
           <div>
-            <div><button>Найти</button></div>
+            <div><button type="submit">Найти</button></div>
           </div>
         </div>
       </fieldset>

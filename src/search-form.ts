@@ -1,5 +1,41 @@
 import { renderBlock } from './lib.js'
 
+/*Создать интерфейс SearchFormData, в котором описать структуру для полей поисковой формы.
+ Написать функцию-обработчик формы search, которая собирает заполненные пользователем 
+ данные в формате описанной структуры и передаёт их в функцию поиска. Функция поиска 
+ принимает как аргумент переменную интерфейса SearchFormData, выводит полученный аргумент 
+ в консоль и ничего не возвращает.*/
+
+
+interface SearchFormData {
+  // city: string,
+  inDate: string,
+  outDate: string,
+  maxPrice: number,
+}
+
+function handlerSearch(data: SearchFormData):void {
+  console.log(data)
+}
+
+export function search() {
+  const form = document.getElementsByTagName('form')[0];
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    let formData = new FormData(form);
+  
+  const data: SearchFormData = {
+    // city: formData.get('city').toString(),
+    inDate: formData.get('checkin').toString(),
+    outDate: formData.get('checkout').toString(),
+    maxPrice: +formData.get('price')
+  }
+
+    handlerSearch(data);
+}
+}
+
 const d = new Date();
 const dateOut = new Date(d.getFullYear(), d.getMonth() + 2, 0);
 const defaultDateIn = new Date(d.setDate(d.getDate() + 1));
@@ -18,7 +54,7 @@ export function renderSearchFormBlock (dateIn: string = defaultIn, dateOut: stri
   renderBlock(
     'search-form-block',
     `
-    <form>
+    <form id="form">
       <fieldset class="search-filedset">
         <div class="row">
           <div>
@@ -45,7 +81,7 @@ export function renderSearchFormBlock (dateIn: string = defaultIn, dateOut: stri
             <input id="max-price" type="text" value="" name="price" class="max-price" />
           </div>
           <div>
-            <div><button>Найти</button></div>
+            <div><button type="submit">Найти</button></div>
           </div>
         </div>
       </fieldset>
