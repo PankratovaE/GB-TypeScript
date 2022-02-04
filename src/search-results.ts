@@ -57,7 +57,7 @@ const favoriteAll: favoritePlaces = {
 
 
 
-export function toggleFavoriteItem() {
+export function toggleFavoriteItem(): void {
 
   const blocks = document.querySelectorAll('#heart');
 
@@ -138,16 +138,16 @@ export function renderSearchResultsBlock (Places) {
     <li class="result">
       <div class="result-container">
         <div class="result-img-container">
-          <div class="favorites ${ inFavorites? 'active' : '' }" id="heart" data-id="${ Places[i].id }" data-name="${ Places[i].name }" data-image="${ Places[i].image }"></div>
-          <img class="result-img" src="${ Places[i].image }" alt="">
+          <div class="favorites ${ inFavorites? 'active' : '' }" id="heart" data-id="${ Places[i].id }" data-name="${ Places[i].title }" data-image="${ Places[i].photos }"></div>
+          <img class="result-img" src="${ Places[i].photos[0] }" alt="">
         </div>	
         <div class="result-info">
           <div class="result-info--header">
-            <p>${Places[i].name}</p>
-            <p class="price">${Places[i].price}</p>
+            <p>${Places[i].title}</p>
+            <p class="price">${Places[i].totalPrice}</p>
           </div>
           <div class="result-info--map"><i class="map-icon"></i> 2.5км от вас</div>
-          <div class="result-info--descr">${ Places[i].description }</div>
+          <div class="result-info--descr">${ Places[i].details }</div>
           <div class="result-info--footer">
             <div>
               <button>Забронировать</button>
