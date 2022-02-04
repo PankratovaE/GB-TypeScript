@@ -1,4 +1,4 @@
-export let dataDb;
+export let dataDb: any;
 
 export function getData() {
    return fetch('http://localhost:5555/places').then(r => r.json()).then((result) => dataDb = result);
