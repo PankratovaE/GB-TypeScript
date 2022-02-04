@@ -7,9 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf public/scripts && tsc",
     "build:dev": "rimraf public/scripts && tsc -p tsconfig.dev.json",
-    "start": "http-server -p 3000 public",
+    "start": "http-server -p 4100 public",
     "lint": "eslint src --ext .js --ext .ts",
-    "lint-fix": "eslint src --ext .js --ext .ts --fix"
+    "lint-fix": "eslint src --ext .js --ext .ts --fix",
+    "backend": "json-server -p 5555 ./db.json"
   },
   "repository": {
     "type": "git",
@@ -29,5 +30,8 @@
     "http-server": "^14.0.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "json-server": "^0.17.0"
   }
 }

@@ -1,11 +1,20 @@
 import { renderBlock } from './lib.js'
+import { dataDb } from './index.js'
+import { renderSearchResultsBlock, toggleFavoriteItem } from './search-results.js'
 
-/*Создать интерфейс SearchFormData, в котором описать структуру для полей поисковой формы.
- Написать функцию-обработчик формы search, которая собирает заполненные пользователем 
- данные в формате описанной структуры и передаёт их в функцию поиска. Функция поиска 
- принимает как аргумент переменную интерфейса SearchFormData, выводит полученный аргумент 
- в консоль и ничего не возвращает.*/
+interface Place {
+  "id": number,
+  "name": string,
+  "description": string,
+  "image": string,
+  "remoteness": number,
+  "bookedDates": string[],
+  "price": number
+}
 
+interface Places {
+  [key: number]: Place
+}
 
 interface SearchFormData {
   // city: string,
@@ -14,8 +23,30 @@ interface SearchFormData {
   maxPrice: number,
 }
 
-function handlerSearch(data: SearchFormData):void {
-  console.log(data)
+function handlerSearch(data, price): Places {
+  let allFind = {};
+  let find = null;
+  let key = null;
+
+  (function searchAll (data, price) {
+    for (let i in data) {
+        if (data.hasOwnProperty(i)) {
+          if (i === 'price') {
+            if ( price >= data[i]) {
+              find = data;
+              key = data.id;
+              allFind[key] = find;
+            }
+          }
+          if (data[i] && data[i].constructor === Object) {
+            searchAll(data[i], price)
+          }
+        }
+      }
+    return allFind;  
+  })(data, price)
+
+  return allFind;
 }
 
 export function search() {
@@ -32,7 +63,8 @@ export function search() {
     maxPrice: +formData.get('price')
   }
 
-    handlerSearch(data);
+  renderSearchResultsBlock(handlerSearch(dataDb, data.maxPrice));
+  toggleFavoriteItem();
 }
 }
 
